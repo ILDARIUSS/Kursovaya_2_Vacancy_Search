@@ -1,0 +1,21 @@
+# Игнорируем виртуальное окружение
+venv/
+.env
+
+# Игнорируем кэш и временные файлы Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Игнорируем файлы IDE
+.idea/
+.vscode/
+*.iml
+
+# Игнорируем файлы зависимостей
+*.log
+Pipfile
+Pipfile.lock
+*.sqlite3
+test_vacancies.json

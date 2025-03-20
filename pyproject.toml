@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "kursovaya-2-vacancy-search"
 version = "0.1.0"
-description = ""
+description = "Курсовая работа: поиск вакансий с hh.ru через API"
 authors = ["ildar_safarov <ildarsafarov555@gmail.com>"]
 readme = "README.md"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.13"
