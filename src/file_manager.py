@@ -1,38 +1,56 @@
+from abc import ABC, abstractmethod
+from typing import List
+from src.vacancy import Vacancy
 import json
 import os
-from typing import List
-from dataclasses import asdict
-from src.vacancy import Vacancy
 
-class JSONFileManager:
-    """Класс для работы с JSON-файлом."""
+class AbstractFileManager(ABC):
 
+    @abstractmethod
+    def save_vacancies(self, vacancies: List[Vacancy]) -> None:
+        pass
+
+    @abstractmethod
+    def load_vacancies(self) -> List[Vacancy]:
+        pass
+
+    @abstractmethod
+    def add_vacancy(self, vacancy: Vacancy) -> None:
+        pass
+
+    @abstractmethod
+    def delete_vacancy(self, vacancy: Vacancy) -> None:
+        pass
+
+
+class JSONFileManager(AbstractFileManager):
     def __init__(self, filename: str = "vacancies.json"):
         self._filename = filename
 
-    def save_vacancies(self, vacancies: List[Vacancy]) -> None:
-        """Сохраняет список вакансий в JSON-файл."""
+    def _read_file(self) -> List[dict]:
+        if not os.path.exists(self._filename):
+            return []
+        with open(self._filename, "r", encoding="utf-8") as file:
+            return json.load(file)
+
+    def _write_file(self, data: List[dict]) -> None:
         with open(self._filename, "w", encoding="utf-8") as file:
-            json.dump([asdict(vacancy) for vacancy in vacancies], file, ensure_ascii=False, indent=4)
+            json.dump(data, file, ensure_ascii=False, indent=4)
+
+    def save_vacancies(self, vacancies: List[Vacancy]) -> None:
+        existing = self._read_file()
+        existing_urls = {vac["url"] for vac in existing}
+        new_vacancies = [v.to_dict() for v in vacancies if v.url not in existing_urls]
+        self._write_file(existing + new_vacancies)
 
     def load_vacancies(self) -> List[Vacancy]:
-        """Загружает список вакансий из JSON-файла."""
-        try:
-            with open(self._filename, "r", encoding="utf-8") as file:
-                vacancies_data = json.load(file)
-                return [Vacancy(**data) for data in vacancies_data]
-        except (FileNotFoundError, json.JSONDecodeError):
-            return []
+        data = self._read_file()
+        return [Vacancy(**item) for item in data]
 
     def add_vacancy(self, vacancy: Vacancy) -> None:
-        """Добавляет вакансию в JSON-файл."""
-        vacancies = self.load_vacancies()
-        if vacancy not in vacancies:
-            vacancies.append(vacancy)
-            self.save_vacancies(vacancies)
+        self.save_vacancies([vacancy])
 
     def delete_vacancy(self, vacancy: Vacancy) -> None:
-        """Удаляет вакансию из JSON-файла."""
-        vacancies = self.load_vacancies()
-        vacancies = [v for v in vacancies if v.url != vacancy.url]
-        self.save_vacancies(vacancies)
+        data = self._read_file()
+        updated = [item for item in data if item["url"] != vacancy.url]
+        self._write_file(updated)
