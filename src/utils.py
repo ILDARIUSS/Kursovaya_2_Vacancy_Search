@@ -21,7 +21,7 @@ def filter_vacancies_by_salary(vacancies: List[Vacancy], min_salary: int) -> Lis
     :param min_salary: Минимальная зарплата
     :return: Отфильтрованный список вакансий
     """
-    return [vacancy for vacancy in vacancies if vacancy._get_salary_value() >= min_salary]
+    return [vacancy for vacancy in vacancies if vacancy.salary >= min_salary]
 
 
 def sort_vacancies(vacancies: List[Vacancy], reverse: bool = True) -> List[Vacancy]:

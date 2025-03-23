@@ -6,13 +6,18 @@ class Vacancy:
 
     __slots__ = ("name", "url", "salary", "description")
 
-    def __init__(self, name: str, url: str, salary: Optional[dict], description: Optional[str]):
+    def __init__(self, name: str, url: str, salary: Optional[dict | int], description: Optional[str]):
         self.name = name
         self.url = url
         self.salary = self._parse_salary(salary)
         self.description = description if isinstance(description, str) else "Описание отсутствует"
 
-    def _parse_salary(self, salary: Optional[dict]) -> int:
+    def _parse_salary(self, salary: Optional[dict | int]) -> int:
+        """
+        Преобразует salary в число. Может быть словарь (с hh.ru) или уже int (из JSON).
+        """
+        if isinstance(salary, int):
+            return salary
         if salary and "from" in salary:
             return salary["from"]
         elif salary and "to" in salary:
